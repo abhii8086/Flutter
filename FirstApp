@@ -1,0 +1,114 @@
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Random Number Graph',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Random Number Graph'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int? _number1;
+  int? _number2;
+
+  void _generateNumbers() {
+    setState(() {
+      final random = Random();
+      _number1 = random.nextInt(1001); // Generate a number between 0 and 1000
+      _number2 = random.nextInt(1001); // Generate another number between 0 and 1000
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            if (_number1 != null && _number2 != null) ...[
+              Text(
+                'Number 1: $_number1',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Text(
+                'Number 2: $_number2',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              SizedBox(
+                height: 300,
+                width: 300,
+                child: CustomPaint(
+                  painter: LinePainter(_number1!, _number2!),
+                ),
+              ),
+            ] else
+              const Text('Press the button to generate numbers.'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _generateNumbers,
+              child: const Text('Generate'),
+            ),
+          ],
+        ),
+      ),
+
+    );
+  }
+}
+
+class LinePainter extends CustomPainter {
+  final int number1;
+  final int number2;
+
+  LinePainter(this.number1, this.number2);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 3;
+
+    // Normalize numbers to fit in the canvas height
+    final normalizedY1 = size.height - (number1 / 1000) * size.height;
+    final normalizedY2 = size.height - (number2 / 1000) * size.height;
+
+    canvas.drawLine(
+      Offset(0, normalizedY1),
+      Offset(size.width, normalizedY2),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
